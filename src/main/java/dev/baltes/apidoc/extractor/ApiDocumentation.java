@@ -45,7 +45,7 @@ class ApiDocumentation {
 
     @Override
     public String toString() {
-        return String.format("\"%s\", \"%s\", \"%s\", \"%s\"", getMethod(), getPath(), getDocumentation(), getNotes());
+        return String.format("\"%s\",\"%s\",\"%s\",\"%s\"", getMethod(), getPath(), getDocumentation(), getNotes());
     }
 
     private String clean(String str) {
