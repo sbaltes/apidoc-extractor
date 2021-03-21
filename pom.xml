@@ -45,6 +45,8 @@
         <!-- Other dependencies -->
         <!-- https://mvnrepository.com/artifact/com.github.javaparser/javaparser-symbol-solver-core -->
         <javaparser.version>3.20.0</javaparser.version>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
+        <commons-csv.version>1.8</commons-csv.version>
     </properties>
 
     <distributionManagement>
@@ -77,6 +79,11 @@
             <groupId>com.github.javaparser</groupId>
             <artifactId>javaparser-core-serialization</artifactId>
             <version>${javaparser.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>${commons-csv.version}</version>
         </dependency>
     </dependencies>
 

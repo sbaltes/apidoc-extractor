@@ -1,6 +1,17 @@
 package dev.baltes.apidoc.extractor;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.QuoteMode;
+
 class ApiDocumentation {
+    static final CSVFormat csvFormat = CSVFormat.DEFAULT
+            .withHeader("repo", "file", "method", "path", "documentation", "notes")
+            .withDelimiter(',')
+                .withQuote('"')
+                .withQuoteMode(QuoteMode.MINIMAL)
+                .withEscape('\\')
+                .withNullString("");
+
     private String filename;
     private String repo;
     private String file;
@@ -40,6 +51,14 @@ class ApiDocumentation {
         this.notes = notes;
     }
 
+    public String getRepo() {
+        return repo;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
     public String getFilename() {
         return filename;
     }
@@ -64,7 +83,7 @@ class ApiDocumentation {
         return (notes == null || clean(notes).isBlank()) ? "n/a" : clean(notes);
     }
 
-    private String getFullpath() {
+    private String getFullPath() {
         if (getPath().isBlank()) return "n/a";
         if (getClasspath().isBlank()) return getPath();
         return String.format("%s/%s", getClasspath(), getPath()).replaceAll("/{2,}", "/");
@@ -73,7 +92,7 @@ class ApiDocumentation {
     @Override
     public String toString() {
         return String.format("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"",
-                repo, file, getMethod(), getFullpath(), getDocumentation(), getNotes());
+                repo, file, getMethod(), getFullPath(), getDocumentation(), getNotes());
     }
 
     private String clean(String str) {
@@ -87,7 +106,7 @@ class ApiDocumentation {
 
     public boolean isEmpty() {
         return getMethod().equals("n/a")
-                && getFullpath().equals("n/a")
+                && getFullPath().equals("n/a")
                 && getDocumentation().equals("n/a")
                 && getNotes().equals("n/a");
     }

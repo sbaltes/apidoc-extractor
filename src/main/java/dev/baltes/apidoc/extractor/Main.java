@@ -1,25 +1,27 @@
 package dev.baltes.apidoc.extractor;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Properties;
-import java.util.stream.Stream;
-
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import org.apache.commons.csv.CSVPrinter;
+
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class Main {
-    public static void main(String[] args) {
+    private static final List<ApiDocumentation> collectedApiDocumentation = Collections.synchronizedList(new ArrayList<>());
 
-        // System.out.println("Reading properties...");
+    public static void main(String[] args) {
+        System.out.println("Reading properties...");
         Properties properties = new Properties();
         try (FileInputStream config = new FileInputStream("config.properties")) {
             properties.load(config);
@@ -28,24 +30,42 @@ public class Main {
         }
 
         String inputDirectory = properties.getProperty("InputDirectory");
-        // System.out.printf("Reading Java files from directory '%s'...%n", inputDirectory);
+        String outputFile = properties.getProperty("OutputFile");
+
+        System.out.printf("Reading Java files from directory '%s'...%n", inputDirectory);
         try (Stream<Path> files = Files.list(Paths.get(inputDirectory))) {
 
-            // System.out.println("Extracting API documentation...");
-            System.out.println("\"repo\",\"file\",\"method\",\"path\",\"documentation\",\"notes\"");
-
+            System.out.println("Extracting API documentation...");
             files.forEach(file -> {
                 try {
-                    ApiDocumentation apiDocumentation = new ApiDocumentation();
-                    apiDocumentation.setFilename(file.getFileName().toString());
+                    ApiDocumentation currentApiDocumentation = new ApiDocumentation();
+                    currentApiDocumentation.setFilename(file.getFileName().toString());
 
                     CompilationUnit cu = StaticJavaParser.parse(file);
-                    new ClassAnnotationVisitor().visit(cu, apiDocumentation);
-                    new MethodAnnotationVisitor().visit(cu, apiDocumentation);
+                    new ClassAnnotationVisitor().visit(cu, currentApiDocumentation);
+                    new MethodAnnotationVisitor().visit(cu, currentApiDocumentation);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             });
+
+            System.out.printf("Exporting %d collected API annotations to output file %s...%n",
+                    collectedApiDocumentation.size(), outputFile);
+            try (CSVPrinter csvPrinter = new CSVPrinter(new FileWriter(outputFile), ApiDocumentation.csvFormat)) {
+                // header is automatically written
+                for (ApiDocumentation apiDocumentation : collectedApiDocumentation) {
+                    csvPrinter.printRecord(
+                            apiDocumentation.getRepo(),
+                            apiDocumentation.getFile(),
+                            apiDocumentation.getMethod(),
+                            apiDocumentation.getPath(),
+                            apiDocumentation.getDocumentation(),
+                            apiDocumentation.getNotes()
+                    );
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,7 +75,9 @@ public class Main {
         @Override
         public void visit(final ClassOrInterfaceDeclaration n, final ApiDocumentation arg) {
 
+            System.out.printf("Visiting class %s...%n", n.getName());
             for (AnnotationExpr annotation : n.getAnnotations()) {
+                System.out.printf("Visiting annotation %s...%n", annotation.toString());
                 annotation.toAnnotationExpr().ifPresent(annotationExpr -> {
 
                     // Api:
@@ -131,9 +153,9 @@ public class Main {
             apiDocumentation.setFilename(arg.getFilename());
             apiDocumentation.setClasspath(arg.getClasspath());
 
-            // System.out.printf("Visiting method %s...%n", n.getName());
+            System.out.printf("Visiting method %s...%n", n.getName());
             for (AnnotationExpr annotation : n.getAnnotations()) {
-                // System.out.printf("Visiting annotation %s...%n", annotation.toString());
+                System.out.printf("Visiting annotation %s...%n", annotation.toString());
                 annotation.toAnnotationExpr().ifPresent(annotationExpr -> {
 
                     String annotationName = annotationExpr.getName().asString();
@@ -186,7 +208,7 @@ public class Main {
                                 .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
                                     if (pair.getName().toString().equals("method")) {
                                         String[] methods = pair.getValue().toString()
-                                                .replaceAll("\\{ |RequestMethod.| \\}", "").split(", ");
+                                                .replaceAll("\\{ |RequestMethod.| }", "").split(", ");
                                         Arrays.sort(methods);
                                         apiDocumentation.setMethod(String.join(", ", methods));
                                     } else if (pair.getName().toString().equals("path")
@@ -221,12 +243,16 @@ public class Main {
 
                         annotationExpr.toNormalAnnotationExpr()
                                 .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
-                                    if (pair.getName().toString().equals("method")) {
-                                        apiDocumentation.setMethod(pair.getValue().toString());
-                                    } else if (pair.getName().toString().equals("summary")) {
-                                        apiDocumentation.setDocumentation(pair.getValue().toString());
-                                    } else if (pair.getName().toString().equals("description")) {
-                                        apiDocumentation.setNotes(pair.getValue().toString());
+                                    switch (pair.getName().toString()) {
+                                        case "method":
+                                            apiDocumentation.setMethod(pair.getValue().toString());
+                                            break;
+                                        case "summary":
+                                            apiDocumentation.setDocumentation(pair.getValue().toString());
+                                            break;
+                                        case "description":
+                                            apiDocumentation.setNotes(pair.getValue().toString());
+                                            break;
                                     }
                                 }));
                         break;
@@ -240,12 +266,16 @@ public class Main {
 
                         annotationExpr.toNormalAnnotationExpr()
                                 .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
-                                    if (pair.getName().toString().equals("httpMethod")) {
-                                        apiDocumentation.setMethod(pair.getValue().toString());
-                                    } else if (pair.getName().toString().equals("value")) {
-                                        apiDocumentation.setDocumentation(pair.getValue().toString());
-                                    } else if (pair.getName().toString().equals("notes")) {
-                                        apiDocumentation.setNotes(pair.getValue().toString());
+                                    switch (pair.getName().toString()) {
+                                        case "httpMethod":
+                                            apiDocumentation.setMethod(pair.getValue().toString());
+                                            break;
+                                        case "value":
+                                            apiDocumentation.setDocumentation(pair.getValue().toString());
+                                            break;
+                                        case "notes":
+                                            apiDocumentation.setNotes(pair.getValue().toString());
+                                            break;
                                     }
                                 }));
                         break;
@@ -257,7 +287,7 @@ public class Main {
             }
 
             if (!apiDocumentation.isEmpty()) {
-                System.out.println(apiDocumentation);
+                collectedApiDocumentation.add(apiDocumentation);
             }
         }
     }
