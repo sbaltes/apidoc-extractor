@@ -93,7 +93,7 @@ public class Main {
                                 .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
                                     if (!pair.getValue().toString().contains(" ")
                                             && (pair.getName().toString().equals("basePath")
-                                                    || pair.getName().toString().equals("value"))) {
+                                            || pair.getName().toString().equals("value"))) {
                                         arg.setClasspath(pair.getValue().toString());
                                     }
                                 }));
@@ -106,38 +106,38 @@ public class Main {
 
                     switch (annotationExpr.getName().asString()) {
 
-                    // RequestMapping:
-                    // https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestMapping.html
-                    case "RequestMapping":
-                        annotationExpr.toSingleMemberAnnotationExpr().ifPresent(singleMemberAnnotationExpr -> arg
-                                .setClasspath(singleMemberAnnotationExpr.getMemberValue().toString()));
+                        // RequestMapping:
+                        // https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestMapping.html
+                        case "RequestMapping":
+                            annotationExpr.toSingleMemberAnnotationExpr().ifPresent(singleMemberAnnotationExpr -> arg
+                                    .setClasspath(singleMemberAnnotationExpr.getMemberValue().toString()));
 
-                        annotationExpr.toNormalAnnotationExpr()
-                                .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
-                                    if (pair.getName().toString().equals("path")
-                                            || pair.getName().toString().equals("value")) {
-                                        arg.setClasspath(pair.getValue().toString());
-                                    }
-                                }));
-                        break;
+                            annotationExpr.toNormalAnnotationExpr()
+                                    .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
+                                        if (pair.getName().toString().equals("path")
+                                                || pair.getName().toString().equals("value")) {
+                                            arg.setClasspath(pair.getValue().toString());
+                                        }
+                                    }));
+                            break;
 
-                    // Path:
-                    // https://docs.oracle.com/javaee/7/api/javax/ws/rs/Path.html
-                    case "Path":
-                    case "javax.ws.rs.Path":
-                        annotationExpr.toSingleMemberAnnotationExpr().ifPresent(singleMemberAnnotationExpr -> arg
-                                .setClasspath(singleMemberAnnotationExpr.getMemberValue().toString()));
+                        // Path:
+                        // https://docs.oracle.com/javaee/7/api/javax/ws/rs/Path.html
+                        case "Path":
+                        case "javax.ws.rs.Path":
+                            annotationExpr.toSingleMemberAnnotationExpr().ifPresent(singleMemberAnnotationExpr -> arg
+                                    .setClasspath(singleMemberAnnotationExpr.getMemberValue().toString()));
 
-                        annotationExpr.toNormalAnnotationExpr()
-                                .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
-                                    if (pair.getName().toString().equals("value")) {
-                                        arg.setClasspath(pair.getValue().toString());
-                                    }
-                                }));
-                        break;
+                            annotationExpr.toNormalAnnotationExpr()
+                                    .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
+                                        if (pair.getName().toString().equals("value")) {
+                                            arg.setClasspath(pair.getValue().toString());
+                                        }
+                                    }));
+                            break;
 
-                    default:
-                        break;
+                        default:
+                            break;
                     }
                 });
             }
@@ -162,126 +162,126 @@ public class Main {
 
                     switch (annotationName) {
 
-                    // Methods:
-                    // https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestMethod.html
-                    case "GET":
-                    case "HEAD":
-                    case "POST":
-                    case "PUT":
-                    case "DELETE":
-                    case "OPTIONS":
-                    case "PATCH":
-                    case "TRACE":
-                        apiDocumentation.setMethod(annotationName);
-                        break;
+                        // Methods:
+                        // https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestMethod.html
+                        case "GET":
+                        case "HEAD":
+                        case "POST":
+                        case "PUT":
+                        case "DELETE":
+                        case "OPTIONS":
+                        case "PATCH":
+                        case "TRACE":
+                            apiDocumentation.setMethod(annotationName);
+                            break;
 
-                    // Mappings:
-                    // https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/GetMapping.html
-                    case "GetMapping":
-                    case "PostMapping":
-                    case "PutMapping":
-                    case "DeleteMapping":
-                    case "PatchMapping":
-                        apiDocumentation.setMethod(annotationName.replace("Mapping", "").toUpperCase());
+                        // Mappings:
+                        // https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/GetMapping.html
+                        case "GetMapping":
+                        case "PostMapping":
+                        case "PutMapping":
+                        case "DeleteMapping":
+                        case "PatchMapping":
+                            apiDocumentation.setMethod(annotationName.replace("Mapping", "").toUpperCase());
 
-                        annotationExpr.toSingleMemberAnnotationExpr()
-                                .ifPresent(singleMemberAnnotationExpr -> apiDocumentation
-                                        .setPath(singleMemberAnnotationExpr.getMemberValue().toString()));
+                            annotationExpr.toSingleMemberAnnotationExpr()
+                                    .ifPresent(singleMemberAnnotationExpr -> apiDocumentation
+                                            .setPath(singleMemberAnnotationExpr.getMemberValue().toString()));
 
-                        annotationExpr.toNormalAnnotationExpr()
-                                .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
-                                    if (pair.getName().toString().equals("path")
-                                            || pair.getName().toString().equals("value")) {
-                                        apiDocumentation.setPath(pair.getValue().toString());
-                                    }
-                                }));
-                        break;
+                            annotationExpr.toNormalAnnotationExpr()
+                                    .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
+                                        if (pair.getName().toString().equals("path")
+                                                || pair.getName().toString().equals("value")) {
+                                            apiDocumentation.setPath(pair.getValue().toString());
+                                        }
+                                    }));
+                            break;
 
-                    // RequestMapping:
-                    // https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestMapping.html
-                    case "RequestMapping":
-                        annotationExpr.toSingleMemberAnnotationExpr()
-                                .ifPresent(singleMemberAnnotationExpr -> apiDocumentation
-                                        .setPath(singleMemberAnnotationExpr.getMemberValue().toString()));
+                        // RequestMapping:
+                        // https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestMapping.html
+                        case "RequestMapping":
+                            annotationExpr.toSingleMemberAnnotationExpr()
+                                    .ifPresent(singleMemberAnnotationExpr -> apiDocumentation
+                                            .setPath(singleMemberAnnotationExpr.getMemberValue().toString()));
 
-                        annotationExpr.toNormalAnnotationExpr()
-                                .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
-                                    if (pair.getName().toString().equals("method")) {
-                                        String[] methods = pair.getValue().toString()
-                                                .replaceAll("\\{ |RequestMethod.| }", "").split(", ");
-                                        Arrays.sort(methods);
-                                        apiDocumentation.setMethod(String.join(", ", methods));
-                                    } else if (pair.getName().toString().equals("path")
-                                            || pair.getName().toString().equals("value")) {
-                                        apiDocumentation.setPath(pair.getValue().toString());
-                                    }
-                                }));
-                        break;
+                            annotationExpr.toNormalAnnotationExpr()
+                                    .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
+                                        if (pair.getName().toString().equals("method")) {
+                                            String[] methods = pair.getValue().toString()
+                                                    .replaceAll("\\{ |RequestMethod.| }", "").split(", ");
+                                            Arrays.sort(methods);
+                                            apiDocumentation.setMethod(String.join(", ", methods));
+                                        } else if (pair.getName().toString().equals("path")
+                                                || pair.getName().toString().equals("value")) {
+                                            apiDocumentation.setPath(pair.getValue().toString());
+                                        }
+                                    }));
+                            break;
 
-                    // Path:
-                    // https://docs.oracle.com/javaee/7/api/javax/ws/rs/Path.html
-                    case "Path":
-                    case "javax.ws.rs.Path":
-                        annotationExpr.toSingleMemberAnnotationExpr()
-                                .ifPresent(singleMemberAnnotationExpr -> apiDocumentation
-                                        .setPath(singleMemberAnnotationExpr.getMemberValue().toString()));
+                        // Path:
+                        // https://docs.oracle.com/javaee/7/api/javax/ws/rs/Path.html
+                        case "Path":
+                        case "javax.ws.rs.Path":
+                            annotationExpr.toSingleMemberAnnotationExpr()
+                                    .ifPresent(singleMemberAnnotationExpr -> apiDocumentation
+                                            .setPath(singleMemberAnnotationExpr.getMemberValue().toString()));
 
-                        annotationExpr.toNormalAnnotationExpr()
-                                .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
-                                    if (pair.getName().toString().equals("value")) {
-                                        apiDocumentation.setPath(pair.getValue().toString());
-                                    }
-                                }));
-                        break;
+                            annotationExpr.toNormalAnnotationExpr()
+                                    .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
+                                        if (pair.getName().toString().equals("value")) {
+                                            apiDocumentation.setPath(pair.getValue().toString());
+                                        }
+                                    }));
+                            break;
 
-                    // Operation:
-                    // https://docs.swagger.io/swagger-core/v2.1.7/apidocs/io/swagger/v3/oas/annotations/Operation.html
-                    case "Operation":
-                        annotationExpr.toSingleMemberAnnotationExpr()
-                                .ifPresent(singleMemberAnnotationExpr -> apiDocumentation
-                                        .setDocumentation(singleMemberAnnotationExpr.getMemberValue().toString()));
+                        // Operation:
+                        // https://docs.swagger.io/swagger-core/v2.1.7/apidocs/io/swagger/v3/oas/annotations/Operation.html
+                        case "Operation":
+                            annotationExpr.toSingleMemberAnnotationExpr()
+                                    .ifPresent(singleMemberAnnotationExpr -> apiDocumentation
+                                            .setDocumentation(singleMemberAnnotationExpr.getMemberValue().toString()));
 
-                        annotationExpr.toNormalAnnotationExpr()
-                                .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
-                                    switch (pair.getName().toString()) {
-                                        case "method":
-                                            apiDocumentation.setMethod(pair.getValue().toString());
-                                            break;
-                                        case "summary":
-                                            apiDocumentation.setDocumentation(pair.getValue().toString());
-                                            break;
-                                        case "description":
-                                            apiDocumentation.setNotes(pair.getValue().toString());
-                                            break;
-                                    }
-                                }));
-                        break;
+                            annotationExpr.toNormalAnnotationExpr()
+                                    .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
+                                        switch (pair.getName().toString()) {
+                                            case "method":
+                                                apiDocumentation.setMethod(pair.getValue().toString());
+                                                break;
+                                            case "summary":
+                                                apiDocumentation.setDocumentation(pair.getValue().toString());
+                                                break;
+                                            case "description":
+                                                apiDocumentation.setNotes(pair.getValue().toString());
+                                                break;
+                                        }
+                                    }));
+                            break;
 
-                    // ApiOperation:
-                    // https://docs.swagger.io/swagger-core/v1.5.X/apidocs/io/swagger/annotations/ApiOperation.html
-                    case "ApiOperation":
-                        annotationExpr.toSingleMemberAnnotationExpr()
-                                .ifPresent(singleMemberAnnotationExpr -> apiDocumentation
-                                        .setDocumentation(singleMemberAnnotationExpr.getMemberValue().toString()));
+                        // ApiOperation:
+                        // https://docs.swagger.io/swagger-core/v1.5.X/apidocs/io/swagger/annotations/ApiOperation.html
+                        case "ApiOperation":
+                            annotationExpr.toSingleMemberAnnotationExpr()
+                                    .ifPresent(singleMemberAnnotationExpr -> apiDocumentation
+                                            .setDocumentation(singleMemberAnnotationExpr.getMemberValue().toString()));
 
-                        annotationExpr.toNormalAnnotationExpr()
-                                .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
-                                    switch (pair.getName().toString()) {
-                                        case "httpMethod":
-                                            apiDocumentation.setMethod(pair.getValue().toString());
-                                            break;
-                                        case "value":
-                                            apiDocumentation.setDocumentation(pair.getValue().toString());
-                                            break;
-                                        case "notes":
-                                            apiDocumentation.setNotes(pair.getValue().toString());
-                                            break;
-                                    }
-                                }));
-                        break;
+                            annotationExpr.toNormalAnnotationExpr()
+                                    .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
+                                        switch (pair.getName().toString()) {
+                                            case "httpMethod":
+                                                apiDocumentation.setMethod(pair.getValue().toString());
+                                                break;
+                                            case "value":
+                                                apiDocumentation.setDocumentation(pair.getValue().toString());
+                                                break;
+                                            case "notes":
+                                                apiDocumentation.setNotes(pair.getValue().toString());
+                                                break;
+                                        }
+                                    }));
+                            break;
 
-                    default:
-                        break;
+                        default:
+                            break;
                     }
                 });
             }

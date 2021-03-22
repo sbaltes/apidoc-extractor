@@ -4,13 +4,14 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.QuoteMode;
 
 class ApiDocumentation {
-    static final CSVFormat csvFormat = CSVFormat.DEFAULT
+    static final CSVFormat csvFormat = CSVFormat.DEFAULT // uses CRLF as line separator
             .withHeader("repo", "file", "method", "path", "documentation", "notes")
             .withDelimiter(',')
-                .withQuote('"')
-                .withQuoteMode(QuoteMode.MINIMAL)
-                .withEscape('\\')
-                .withNullString("");
+            .withQuote('"')
+            .withQuoteMode(QuoteMode.MINIMAL)
+            .withEscape('\\')
+            .withTrim(true)
+            .withNullString("");
 
     private String filename;
     private String repo;
@@ -68,7 +69,7 @@ class ApiDocumentation {
     }
 
     public String getMethod() {
-        return (method == null || clean(method).isBlank()) ? "n/a" : clean(method);
+        return (method == null || clean(method).isBlank()) ? "" : clean(method);
     }
 
     public String getPath() {
@@ -76,16 +77,20 @@ class ApiDocumentation {
     }
 
     public String getDocumentation() {
-        return (documentation == null || clean(documentation).isBlank()) ? "n/a" : clean(documentation);
+        return (documentation == null || clean(documentation).isBlank()) ? "" : clean(documentation);
     }
 
     public String getNotes() {
-        return (notes == null || clean(notes).isBlank()) ? "n/a" : clean(notes);
+        return (notes == null || clean(notes).isBlank()) ? "" : clean(notes);
     }
 
     private String getFullPath() {
-        if (getPath().isBlank()) return "n/a";
-        if (getClasspath().isBlank()) return getPath();
+        if (getPath().isBlank()) {
+            return "";
+        }
+        if (getClasspath().isBlank()) {
+            return getPath();
+        }
         return String.format("%s/%s", getClasspath(), getPath()).replaceAll("/{2,}", "/");
     }
 
@@ -105,9 +110,9 @@ class ApiDocumentation {
     }
 
     public boolean isEmpty() {
-        return getMethod().equals("n/a")
-                && getFullPath().equals("n/a")
-                && getDocumentation().equals("n/a")
-                && getNotes().equals("n/a");
+        return getMethod().isEmpty()
+                && getFullPath().isEmpty()
+                && getDocumentation().isEmpty()
+                && getNotes().isEmpty();
     }
 }
