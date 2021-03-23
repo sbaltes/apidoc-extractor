@@ -9,7 +9,6 @@ class ApiDocumentation {
             .withDelimiter(',')
             .withQuote('"')
             .withQuoteMode(QuoteMode.MINIMAL)
-            .withEscape('\\')
             .withTrim(true)
             .withNullString("");
 
@@ -28,7 +27,7 @@ class ApiDocumentation {
         this.file = filename.split("#")[1].replace("$", "/");
     }
 
-    public void setClasspath(String classpath) {
+    public void setClassPath(String classpath) {
         this.classpath = classpath;
     }
 
@@ -52,6 +51,10 @@ class ApiDocumentation {
         this.notes = notes;
     }
 
+    public String getFilename() {
+        return filename;
+    }
+    
     public String getRepo() {
         return repo;
     }
@@ -60,44 +63,40 @@ class ApiDocumentation {
         return file;
     }
 
-    public String getFilename() {
-        return filename;
-    }
-
-    public String getClasspath() {
-        return (classpath == null || clean(classpath).isBlank()) ? "" : clean(classpath);
+    public String getClassPath() {
+        return classpath == null ? "" : clean(classpath);
     }
 
     public String getMethod() {
-        return (method == null || clean(method).isBlank()) ? "" : clean(method);
+        return method == null ? "" : clean(method);
     }
 
     public String getPath() {
-        return (path == null || clean(path).isBlank()) ? "" : clean(path);
+        return path == null ? "" : clean(path);
     }
 
     public String getDocumentation() {
-        return (documentation == null || clean(documentation).isBlank()) ? "" : clean(documentation);
+        return documentation == null ? "" : clean(documentation);
     }
 
     public String getNotes() {
-        return (notes == null || clean(notes).isBlank()) ? "" : clean(notes);
+        return notes == null ? "" : clean(notes);
     }
 
-    private String getFullPath() {
-        if (getPath().isBlank()) {
+    public String getFullPath() {
+        if (getPath().isEmpty()) {
             return "";
         }
-        if (getClasspath().isBlank()) {
+        if (getClassPath().isEmpty()) {
             return getPath();
         }
-        return String.format("%s/%s", getClasspath(), getPath()).replaceAll("/{2,}", "/");
+        return String.format("%s/%s", getClassPath(), getPath()).replaceAll("/{2,}", "/");
     }
 
     @Override
     public String toString() {
         return String.format("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"",
-                repo, file, getMethod(), getFullPath(), getDocumentation(), getNotes());
+                getRepo(), getFile(), getMethod(), getFullPath(), getDocumentation(), getNotes());
     }
 
     private String clean(String str) {
@@ -105,8 +104,7 @@ class ApiDocumentation {
                 .replaceAll("(?<!\\\\)((?:\\\\{2})*)\"\\s*\\+\\s*(?!\")", "$1 ")
                 .replaceAll("(?<!\")\\s*\\+\\s*\"", " ")
                 .replaceAll("^\"", "")
-                .replaceAll("\"$", "")
-                .replace("\"", "\"\"");
+                .replaceAll("\"$", "");
     }
 
     public boolean isEmpty() {

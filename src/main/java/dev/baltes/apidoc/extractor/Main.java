@@ -14,7 +14,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
 import java.util.stream.Stream;
 
 public class Main {
@@ -58,7 +62,7 @@ public class Main {
                             apiDocumentation.getRepo(),
                             apiDocumentation.getFile(),
                             apiDocumentation.getMethod(),
-                            apiDocumentation.getPath(),
+                            apiDocumentation.getFullPath(),
                             apiDocumentation.getDocumentation(),
                             apiDocumentation.getNotes()
                     );
@@ -85,7 +89,7 @@ public class Main {
                     if (annotationExpr.getName().asString().equals("Api")) {
                         annotationExpr.toSingleMemberAnnotationExpr().ifPresent(singleMemberAnnotationExpr -> {
                             if (!singleMemberAnnotationExpr.getMemberValue().toString().contains(" ")) {
-                                arg.setClasspath(singleMemberAnnotationExpr.getMemberValue().toString());
+                                arg.setClassPath(singleMemberAnnotationExpr.getMemberValue().toString());
                             }
                         });
 
@@ -94,7 +98,7 @@ public class Main {
                                     if (!pair.getValue().toString().contains(" ")
                                             && (pair.getName().toString().equals("basePath")
                                             || pair.getName().toString().equals("value"))) {
-                                        arg.setClasspath(pair.getValue().toString());
+                                        arg.setClassPath(pair.getValue().toString());
                                     }
                                 }));
                     }
@@ -110,13 +114,13 @@ public class Main {
                         // https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RequestMapping.html
                         case "RequestMapping":
                             annotationExpr.toSingleMemberAnnotationExpr().ifPresent(singleMemberAnnotationExpr -> arg
-                                    .setClasspath(singleMemberAnnotationExpr.getMemberValue().toString()));
+                                    .setClassPath(singleMemberAnnotationExpr.getMemberValue().toString()));
 
                             annotationExpr.toNormalAnnotationExpr()
                                     .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
                                         if (pair.getName().toString().equals("path")
                                                 || pair.getName().toString().equals("value")) {
-                                            arg.setClasspath(pair.getValue().toString());
+                                            arg.setClassPath(pair.getValue().toString());
                                         }
                                     }));
                             break;
@@ -126,17 +130,14 @@ public class Main {
                         case "Path":
                         case "javax.ws.rs.Path":
                             annotationExpr.toSingleMemberAnnotationExpr().ifPresent(singleMemberAnnotationExpr -> arg
-                                    .setClasspath(singleMemberAnnotationExpr.getMemberValue().toString()));
+                                    .setClassPath(singleMemberAnnotationExpr.getMemberValue().toString()));
 
                             annotationExpr.toNormalAnnotationExpr()
                                     .ifPresent(normalAnnotationExpr -> normalAnnotationExpr.getPairs().forEach(pair -> {
                                         if (pair.getName().toString().equals("value")) {
-                                            arg.setClasspath(pair.getValue().toString());
+                                            arg.setClassPath(pair.getValue().toString());
                                         }
                                     }));
-                            break;
-
-                        default:
                             break;
                     }
                 });
@@ -151,7 +152,7 @@ public class Main {
             ApiDocumentation apiDocumentation = new ApiDocumentation();
 
             apiDocumentation.setFilename(arg.getFilename());
-            apiDocumentation.setClasspath(arg.getClasspath());
+            apiDocumentation.setClassPath(arg.getClassPath());
 
             System.out.printf("Visiting method %s...%n", n.getName());
             for (AnnotationExpr annotation : n.getAnnotations()) {
@@ -278,9 +279,6 @@ public class Main {
                                                 break;
                                         }
                                     }));
-                            break;
-
-                        default:
                             break;
                     }
                 });
