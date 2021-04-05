@@ -49,13 +49,6 @@
         <commons-csv.version>1.8</commons-csv.version>
     </properties>
 
-    <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <url>file://${basedir}/../releases/</url>
-        </repository>
-    </distributionManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
